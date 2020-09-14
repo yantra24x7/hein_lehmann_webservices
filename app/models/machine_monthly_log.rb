@@ -63,7 +63,7 @@ class MachineMonthlyLog < ApplicationRecord
 
       tenant.machines.order(:controller_type).map do |mac|
      # machine_log = mac.machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
-      machine_log = mac.external_machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
+      machine_log = mac.machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
      
       data = {
         :tenant_name=>t_name,
@@ -776,9 +776,9 @@ end
 
   #  machine_log = machine.machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
     
-   machine_log = machine.external_machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
+   machine_log = machine.machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
    ###@# 
-   machine_log11 = machine.external_machine_daily_logs 
+   machine_log11 = machine.machine_daily_logs 
    ###@#
 
     #13.235.38.201/api/v1/cr_datum?machine=6&start_time="2019-09-16 16:00:00"&end_time="2019-09-16 20:00:00"
@@ -790,11 +790,11 @@ end
 
       if machine.controller_type == 1 || machine.controller_type == 3
         run_time = Machine.calculate_total_run_time (machine_log)
-        machine_display = machine.external_machine_daily_logs.last.parts_count.present? ? machine.external_machine_logs.last.parts_count.to_i: 0
-      #  machine_display = machine.machine_logs.last.parts_count.to_i
+        machine_display = machine.machine_daily_logs.last.parts_count.present? ? machine.machine_logs.last.parts_count.to_i: 0
+      #  machine_displa= machine.machine_logs.last.parts_count.to_i
       else
         run_time = Machine.run_time(machine_log)
-        machine_display = machine.external_machine_daily_logs.last.parts_count == 0 ? 0: machine.external_machine_logs.last.parts_count.to_i+1
+        machine_display = machine.machine_daily_logs.last.parts_count == 0 ? 0: machine.machine_logs.last.parts_count.to_i+1
        # machine_display = machine.machine_logs.last.parts_count.to_i + 1
       end
 
@@ -1035,7 +1035,7 @@ end
 
       
        data = {
-      :last_update=>machine.external_machine_logs.last.present? ? machine.external_machine_logs.order(:id).last.created_at.in_time_zone("Chennai") : 0,
+      :last_update=>machine.machine_logs.last.present? ? machine.machine_logs.order(:id).last.created_at.in_time_zone("Chennai") : 0,
       :shift_no => shift.shift_no,
       :shift_time => shift.shift_start_time+ ' - ' +shift.shift_end_time,
       :machine_name => machine.machine_name,

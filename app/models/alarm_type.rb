@@ -28,7 +28,7 @@ def self.file_sync(tenant, shift, date)
        # path = "/home/altius/YANTRA/machine_log_files/#{date}/#{tenant.tenant_name}_#{shift.shift_no}.csv"
 	      a = FileUtils.mkdir_p(path1) unless File.exist?(path1)
 	      machines = tenant.machines.pluck(:id)
-	      logs = ExternalMachineLog.where("created_at >=? AND created_at <?",start_time,end_time).where(machine_id: machines).order(:id)
+	      logs = MachineLog.where("created_at >=? AND created_at <?",start_time,end_time).where(machine_id: machines).order(:id)
         message = "#{tenant.tenant_name}-#{shift.shift_no}-#{logs.count}/SYNC TO S3"
 	      CSV.open(path, "wb") do |csv|
 	        csv << ["id", "parts_count", "machine_status", "job_id", "total_run_time", "total_cutting_time", "run_time", "feed_rate", "cutting_speed", "axis_load", "axis_name", "spindle_speed", "spindle_load", "total_run_second", "programe_number", "programe_description", "run_second", "machine_id", "created_at", "updated_at", "machine_time", "x_puls", "y_puls", "z_puls", "a_puls", "b_puls", "machine_total_time", "cycle_time_per_part", "total_cutting_second", "x_load", "y_load", "z_load", "a_load", "z_load", "x_temp", "y_temp", "z_temp", "a_temp", "b_temp", "z_axis", "reason"]
@@ -41,7 +41,7 @@ def self.file_sync(tenant, shift, date)
 	          end
 		      end
         end
-	AlarmType.delay(run_at: end_time + 48.hours, tenant: tenant.id, shift: shift.id, date: date, method: "remove_data").remove_data(tenant.id, shift.id, date)
+	AlarmType.delay(run_at: end_time + 48.hours, tenant: tenant.id, shift: shift.shift_no, date: date, method: "remove_data").remove_data(tenant.id, shift.shift_no, date)
 	end
 
 def self.remove_data(tenant, shift, date)
@@ -61,13 +61,18 @@ date = date.to_time.strftime("%Y-%m-%d")
               end
   machines = tenant.machines.pluck(:id)
  path = "/home/ubuntu/machine_log_files/#{date}/#{tenant.tenant_name}_#{shift.shift_no}.csv"
-logs = ExternalMachineLog.where("created_at >=? AND created_at <?",start_time,end_time).where(machine_id: machines).order(:id)
+logs = MachineLog.where("created_at >=? AND created_at <?",start_time,end_time).where(machine_id: machines).order(:id)
  require 'csv'
 text= CSV.read(path)
 if (text.count - 1) == logs.count
+puts logs.count
+puts "=================***================="
  logs.delete_all
 else
 # logs.delete_all 
+puts "=================***================="
+puts "NOTHING DELETE"
+puts "=================***================="
 end
 
 

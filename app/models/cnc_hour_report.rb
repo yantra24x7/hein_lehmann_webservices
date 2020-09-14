@@ -1041,7 +1041,7 @@ end
       end
       machine_ids = Tenant.find(tenant).machines.where(controller_type: 1).pluck(:id)
 
-      full_log2 = ExternalMachineDailyLog.where(machine_id: machine_ids)#.group_by{|x| x.machine_id} ##1##
+      full_log2 = MachineDailyLog.where(machine_id: machine_ids)#.group_by{|x| x.machine_id} ##1##
       full_log = full_log2.group_by{|x| x.machine_id}
       #full_log = ExternalMachineDailyLog.includes(:machine).where(machines: {tenant_id: tenant, controller_type: 1}).group_by{|x| x.machine_id} ##1##
       machine_log11 = full_log2.select{|a| a[:created_at] >= start_time && a[:created_at] < end_time}.group_by{|x| x.machine_id}
@@ -1291,13 +1291,13 @@ def self.cnc_report_simple_query_hour(tenant, shift_no, date, data)
       machine_ids = Tenant.find(tenant).machines.where(controller_type: 1).pluck(:id)
 
       #full_log = MachineDailyLog.includes(:machine).where(machines: {tenant_id: tenant, controller_type: 1}).group_by{|x| x.machine_id} 
-      full_logs = ExternalMachineDailyLog.where(machine_id: machine_ids).group_by{|x| x.machine_id} ##1##
+      full_logs = MachineDailyLog.where(machine_id: machine_ids).group_by{|x| x.machine_id} ##1##
 
 
       (start_time.to_i..end_time.to_i).step(3600) do |hour|
         (hour.to_i+3600 <= end_time.to_i) ? (hour_start_time=Time.at(hour).strftime("%Y-%m-%d %H:%M"),hour_end_time=Time.at(hour.to_i+3600).strftime("%Y-%m-%d %H:%M")) : (hour_start_time=Time.at(hour).strftime("%Y-%m-%d %H:%M"),hour_end_time=Time.at(end_time).strftime("%Y-%m-%d %H:%M"))
         unless hour_start_time[0].to_time == hour_end_time.to_time          
-           machine_log = ExternalMachineDailyLog.where(created_at: hour_start_time[0].to_time..(hour_end_time.to_time-1), machine_id: machine_ids).group_by{|x| x.machine_id}
+           machine_log = MachineDailyLog.where(created_at: hour_start_time[0].to_time..(hour_end_time.to_time-1), machine_id: machine_ids).group_by{|x| x.machine_id}
             mac_ids = machine_log.keys 
             bls = machine_ids - mac_ids  
             mer_req = bls.map{|i| [i,[]]}.to_h

@@ -585,8 +585,8 @@ def self.dashboard_process(params)
     cur_dur = Time.now.to_i - start_time.to_i
    
     #  machine_log = mac.machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
-       machine_log =  mac.external_machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
-    if mac.controller_type == 1
+       machine_log =  mac.machine_daily_logs.where("created_at >=? AND created_at <?",start_time,end_time).order(:id)
+    if mac.controller_type == 1 && machine_log.count != 0
       run_time = Machine.calculate_total_run_time(machine_log)
       spindle_load = machine_log.last.spindle_load
       sp_temp = machine_log.last.z_axis

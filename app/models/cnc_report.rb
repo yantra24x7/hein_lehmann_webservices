@@ -175,7 +175,7 @@ def self.delay_jobs1
   tenants.each do |tenant|
 
     date = Date.today.strftime("%Y-%m-%d") # "2019-12-25"
-#    date =  "2020-09-06"  
+#    date =  "2020-09-13"  
   CncReport.delay(run_at: date.to_time + 1.hours, method: "sync").data_sync  
   CncReport.delay(run_at: date.to_time + 13.hours, method: "sync").data_sync
     tenant.shift.shifttransactions.each do |shift|
@@ -194,7 +194,7 @@ def self.delay_jobs1
        # end
         
 
-	    unless Delayed::Job.where(run_at: end_time + 4.minutes, tenant: tenant.id, shift: shift.shift_no, date: date, method: "cnc_report_simple_query").present?
+	   unless Delayed::Job.where(run_at: end_time + 4.minutes, tenant: tenant.id, shift: shift.shift_no, date: date, method: "cnc_report_simple_query").present?
 		    CncHourReport.delay(run_at: end_time + 4.minutes, tenant: tenant.id, shift: shift.shift_no, date: date, method: "cnc_report_simple_query").cnc_report_simple_query(tenant.id, shift.shift_no, date)
 		  end
           
@@ -205,7 +205,7 @@ def self.delay_jobs1
           end
 
 
-         unless Delayed::Job.where(run_at: end_time + 10.minutes, tenant: tenant.id, shift: shift.shift_no, date: date, method: "data_sync").present?
+        unless Delayed::Job.where(run_at: end_time + 10.minutes, tenant: tenant.id, shift: shift.shift_no, date: date, method: "data_sync").present?
      AlarmType.delay(run_at: end_time + 10.minutes, tenant: tenant.id, shift: shift.shift_no, date: date, method: "data_sync").file_sync(tenant.id, shift.shift_no, date)
   end
       
