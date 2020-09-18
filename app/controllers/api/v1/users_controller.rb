@@ -23,8 +23,8 @@ class UsersController < ApplicationController
   @user_data = {first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id], tenant_id:params[:tenant_id], role_id:params[:role_id], default: params[:password],isactive: false}    
   @user = User.new(first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id], tenant_id:params[:tenant_id], role_id:params[:role_id], default: params[:password],isactive: false)
    
-   require 'rest-client'
-    RestClient.post "http://13.234.15.170/api/v1/rest_user_create", @user_data, {content_type: :json, accept: :json}    
+#   require 'rest-client'
+#    RestClient.post "http://13.234.15.170/api/v1/rest_user_create", @user_data, {content_type: :json, accept: :json}    
 
 
 
@@ -48,8 +48,8 @@ class UsersController < ApplicationController
     puts params    
     @user_data = {id: params[:id], first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id], tenant_id:params[:tenant_id], role_id:params[:role_id], default: params[:password],isactive: false}
  
-    require 'rest-client'
-    RestClient.post "http://13.234.15.170/api/v1/rest_user_update", @user_data, {content_type: :json, accept: :json}
+ #   require 'rest-client'
+ #   RestClient.post "http://13.234.15.170/api/v1/rest_user_update", @user_data, {content_type: :json, accept: :json}
 
     if @user.update(user_params)
       @user.update(isactive: true)

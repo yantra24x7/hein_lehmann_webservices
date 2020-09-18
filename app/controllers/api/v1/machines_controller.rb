@@ -49,8 +49,8 @@ class MachinesController < ApplicationController
   # POST /machines
   def create
     @machine = Machine.new(machine_params)
-    require 'rest-client'
-    RestClient.post "http://13.234.15.170/api/v1/rest_machine_create", @machine.attributes, {content_type: :json, accept: :json}
+ #   require 'rest-client'
+ #   RestClient.post "http://13.234.15.170/api/v1/rest_machine_create", @machine.attributes, {content_type: :json, accept: :json}
 
 
     if @machine.save
@@ -212,8 +212,8 @@ end
   def update
     
   #   @data = Machine.new(machine_params)
-    require 'rest-client'
-    RestClient.post "http://13.234.15.170/api/v1/rest_machine_update", @machine.attributes, {content_type: :json, accept: :json}
+ #   require 'rest-client'
+ #   RestClient.post "http://13.234.15.170/api/v1/rest_machine_update", @machine.attributes, {content_type: :json, accept: :json}
 
     if @machine.update(machine_params)
       render json: @machine
@@ -306,16 +306,37 @@ end
   #####################33
 # data insert API
   def api
-    mac_id = Machine.find_by_machine_ip(params[:machine_id])
+      mac_id = Machine.find_by_machine_ip(params[:machine_id])
+   if params["machine_status"] != '3' && params["machine_status"] != '100'
+      if mac_id.machine_setting.reason.present?
+        reason = mac_id.machine_setting.reason
+      else
+        reason = "Reason Not Entered"
+      end
+   else
+    mac_id.machine_setting.update(reason: "Reason Not Entered")
+   # reason =  nil
+    reason = "Reason Not Entered"
+   end
 
-        MachineLog.create(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
+
+      axis_load = [{ "x_axis": params[:sv_x], "y_axis": params[:sv_y], "z_axis": params[:sv_z], "a_axis": params[:sv_a], "b_axis": params[:sv_b]}]
+      axis_temp = [{"x_axis": params[:svtemp_x], "y_axis": params[:svtemp_y], "z_axis": params[:svtemp_z], "a_axis": params[:svtemp_a], "b_axis": params[:svtemp_b]}]
+      puls_code = [{"x_axis": params[:svpulse_x], "y_axis": params[:svpulse_y], "z_axis": params[:svpulse_z], "a_axis": params[:svpulse_a], "b_axis": params[:svpulse_b] }]
+
+
+  log = MachineLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
                 job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
                 run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
-                total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number])
-        MachineDailyLog.create(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
+                total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
+
+  MachineDailyLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
                 job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
                 run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
-                total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number])
+                total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
+  
+
+
   end
 
   def alarm_api

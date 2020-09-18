@@ -161,9 +161,9 @@ class SessionsController < ApplicationController
         player_id = params[:player_id]
         unless OneSignal.find_by_player_id(params[:player_id]).present?
      
-          data = {user_id:user.id,tenant_id: user.tenant.id,player_id:player_id}
-          require 'rest-client'
-          RestClient.post "http://13.234.15.170/api/v1/one_sing", data, {content_type: :json, accept: :json}
+#          data = {user_id:user.id,tenant_id: user.tenant.id,player_id:player_id}
+#          require 'rest-client'
+#          RestClient.post "http://13.234.15.170/api/v1/one_sing", data, {content_type: :json, accept: :json}
           onesignal = OneSignal.create(user_id:user.id,tenant_id: user.tenant.id,player_id:player_id)        
         end
         user

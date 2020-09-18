@@ -57,8 +57,8 @@ class TenantsController < ApplicationController
   def tenant_user_creation  
      data = {tenant_name: params[:tenant_name], address_line1: params[:address_line1], address_line2: params[:address_line1], city: params[:city], state: params[:state], country: params[:country], pincode: params[:pincode],  companytype_id:params[:companytype_id],isactive: false, first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id],default: params[:default]} 
     
-     require 'rest-client'
-     RestClient.post "http://13.234.15.170/api/v1/tenants/tenant_user_creation", data, {content_type: :json, accept: :json}
+  #   require 'rest-client'
+  #   RestClient.post "http://13.234.15.170/api/v1/tenants/tenant_user_creation", data, {content_type: :json, accept: :json}
 
   
 
