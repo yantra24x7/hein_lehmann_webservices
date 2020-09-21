@@ -340,18 +340,27 @@ end
   end
 
   def alarm_api
+  
     mac=Machine.find_by_machine_ip(params[:machine_id])
-    iid = mac.nil? ? 0 : mac.id
-    unless (mac.alarm.last.alarm_type == params[:alarm_type]) && ((Time.now - mac.alarm.last.updated_at) >= 120)
-     Alarm.create(alarm_type: params[:alarm_type],alarm_number:params[:alarm_number],alarm_message: params[:alarm_message],emergency: params[:emergency],machine_id: iid)
-    else
-      mac.alarm.last.update(updated_at: Time.now)
-    end
-  end
+      iid = mac.nil? ? 0 : mac.id
+     if mac.alarms.present?
+        mac.alarms.last.update(alarm_type: params[:alarm_type],alarm_number:params[:alarm_number],alarm_message: params[:alarm_message],emergency: params[:emergency],machine_id: iid)
+     else
+       Alarm.create(alarm_type: params[:alarm_type],alarm_number:params[:alarm_number],alarm_message: params[:alarm_message],emergency: params[:emergency],machine_id: iid)
+     end
+
+
+
+ end
   
   def rsmachine_data
-    #byebug
-  end
+     if params[:machine_id] == '192.168.1.202'
+    end
+    mac_id = Machine.find_by_machine_ip(params[:machine_id])
+        MachineLog.create(machine_status: params[:machine_status],parts_count: params[:partscount].to_i,machine_id: mac_id.id,job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:program_number].to_i, spindle_load: params[:sp], z_axis: params[:sp_temp])
+       MachineDailyLog.create(machine_status: params[:machine_status],parts_count: params[:partscount].to_i,machine_id: mac_id.id,job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:program_number].to_i, spindle_load: params[:sp], z_axis: params[:sp_temp])
+
+end
 
    def machine_log_history
      #byebug

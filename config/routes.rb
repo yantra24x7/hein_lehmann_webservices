@@ -38,7 +38,7 @@ Rails.application.routes.draw do
         post 'hmi_reasons/hmi_machine_reason_create'
         get  'hmi_reasons/operator_machine'
         get 'machines/api'
-        get 'machines/alarm_api'
+        post 'machines/alarm_api'
         get 'machines/consolidate_data_export'
         get 'reports/machine_job_report'
         get 'machines/client_dashboard'
@@ -123,7 +123,7 @@ Rails.application.routes.draw do
         get 'active_device', to: 'device_mappings#active_device'
 
         post 'rsmachine_data' => 'machines#rsmachine_data'
-        get 'rsmachine_data' => 'machines#rsmachine_data'
+     #   get 'rsmachine_data' => 'machines#rsmachine_data'
         post 'current_trans' => 'machines#current_trans'
         
 
