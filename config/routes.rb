@@ -37,7 +37,7 @@ Rails.application.routes.draw do
         post 'hmi_reasons/hmi_job_program'
         post 'hmi_reasons/hmi_machine_reason_create'
         get  'hmi_reasons/operator_machine'
-        get 'machines/api'
+        post 'machines/api'
         post 'machines/alarm_api'
         get 'machines/consolidate_data_export'
         get 'reports/machine_job_report'
