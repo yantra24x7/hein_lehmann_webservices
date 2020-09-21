@@ -2,7 +2,7 @@
   module V1
 class MachinesController < ApplicationController
   before_action :set_machine, only: [:show, :update, :destroy]
-  skip_before_action :authenticate_request, only: %i[:api,:alarm_api,:rsmachine_data]
+  skip_before_action :authenticate_request, only: %i[api alarm_api rsmachine_data]
 
 
 
