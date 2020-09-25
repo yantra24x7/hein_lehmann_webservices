@@ -44,6 +44,14 @@ gem 'zip-zip'
 
 gem 'delayed_job_active_record'
 
+gem 'redis'
+gem 'redis-namespace'
+gem 'redis-rails'
+gem 'redis-rack-cache'
+
+
+
+
 #gem 'delayed_job_mongoid'
 # gem 'spreadsheet'
 # gem 'axlsx_rails'

@@ -607,10 +607,10 @@ def self.dashboard_process(params)
 
       if mac.controller_type == 1 || mac.controller_type == 3
         run_time = Machine.calculate_total_run_time (machine_log)
-        machine_display = mac.external_machine_daily_logs.last.parts_count.present? ? mac.external_machine_logs.last.parts_count.to_i: 0
+        machine_display = mac.machine_daily_logs.last.parts_count.present? ? mac.machine_logs.last.parts_count.to_i: 0
       else
         run_time = Machine.run_time(machine_log)
-        machine_display = mac.external_machine_daily_logs.last.parts_count == 0 ? 0: mac.external_machine_logs.last.parts_count.to_i+1
+        machine_display = mac.machine_daily_logs.last.parts_count == 0 ? 0: mac.machine_logs.last.parts_count.to_i+1
       end
 
         if machine_log.where(machine_status: 3).present?
@@ -670,7 +670,7 @@ end
       :machine_id => mac.id,
       :shift_no => shift.shift_no,
       :shift_time => shift.shift_start_time+ ' - ' +shift.shift_end_time,
-      :job_name => mac.external_machine_daily_logs.where.not(:job_id=>"",:programe_number=>nil).order(:id).last.present? ? ""+mac.external_machine_daily_logs.where.not(:job_id=>"",:programe_number=>nil).order(:id).last.programe_number+"-"+mac.external_machine_daily_logs.where.not(:job_id=>"",:programe_number=>nil).order(:id).last.job_id : nil ,
+      :job_name => mac.machine_daily_logs.where.not(:job_id=>"",:programe_number=>nil).order(:id).last.present? ? ""+mac.machine_daily_logs.where.not(:job_id=>"",:programe_number=>nil).order(:id).last.programe_number+"-"+mac.machine_daily_logs.where.not(:job_id=>"",:programe_number=>nil).order(:id).last.job_id : nil ,
       :parts_count => parts,
       :machine_disply => machine_display.present? ? machine_display : 0,
       :utilization => utilization != nil ? utilization : 0,

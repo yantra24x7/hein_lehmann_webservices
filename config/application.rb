@@ -21,6 +21,7 @@ Bundler.require(*Rails.groups)
 
 module Cnc
   class Application < Rails::Application
+    config.cache_store = :redis_store, 'redis://localhost:6379/0/cache', { expires_in: 90.minutes }
  # config.middleware.insert_before 0, Rack::Cors do
  #      allow do
  #        origins '*'

@@ -3,7 +3,7 @@
 class MachinesController < ApplicationController
   before_action :set_machine, only: [:show, :update, :destroy]
   skip_before_action :authenticate_request, only: %i[api alarm_api rsmachine_data]
-
+  include MachineHelper
 
 
   # GET /machines
@@ -305,26 +305,35 @@ end
   #####################33
 # data insert API
   def api
-      mac_id = Machine.find_by_machine_ip(params[:machine_id])
-   if params["machine_status"] != '3' && params["machine_status"] != '100'
-      if mac_id.machine_setting.reason.present?
-        reason = mac_id.machine_setting.reason
+ 
+   
+  m_set = m_setting
+  machine = machine_cache
+
+ find_data = machine.select{|i| i['machine_ip'] == params['machine_id']}
+
+ if find_data.present?
+  mac_id = Machine.new(find_data.first)
+  mac_sets= m_set.select{|i| i['machine_id'] == mac_id.id}
+  if mac_sets.present?
+    mac_set = mac_sets.first
+    machine_setting = MachineSetting.new(mac_set)
+  if params["machine_status"] != '3' && params["machine_status"] != '100'
+      if machine_setting.reason.present?
+        reason = machine_setting.reason
       else
         reason = "Reason Not Entered"
       end
    else
-    mac_id.machine_setting.update(reason: "Reason Not Entered")
-   # reason =  nil
+    #mac_set.update(reason: "Reason Not Entered")
     reason = "Reason Not Entered"
    end
-
 
       axis_load = [{ "x_axis": params[:sv_x], "y_axis": params[:sv_y], "z_axis": params[:sv_z], "a_axis": params[:sv_a], "b_axis": params[:sv_b]}]
       axis_temp = [{"x_axis": params[:svtemp_x], "y_axis": params[:svtemp_y], "z_axis": params[:svtemp_z], "a_axis": params[:svtemp_a], "b_axis": params[:svtemp_b]}]
       puls_code = [{"x_axis": params[:svpulse_x], "y_axis": params[:svpulse_y], "z_axis": params[:svpulse_z], "a_axis": params[:svpulse_a], "b_axis": params[:svpulse_b] }]
 
-
-  log = MachineLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
+log = MachineLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
                 job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
                 run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
                 total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
@@ -333,6 +342,80 @@ end
                 job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
                 run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
                 total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
+  
+# te_setting = setting
+# set_almrm = set_alm
+# user_list = user
+# one_single = one_sing 
+
+# tenant_setting = te_setting.select{|i| i['tenant_id'] == mac_id.tenant_id}
+# if tenant_setting.present? && tenant_setting.first["notification"] == false
+#   alarm_setting = set_alm.select{|i| i['machine_id'] == mac_id.id}
+#   if alarm_setting.present? && alarm_setting.pluck(:active).include?(nil)
+  
+#   else
+#     render json: "Notification Not Set For Machine"
+#   end
+# else
+#   render json: "Notification Not Set For Tenant"
+# end
+       
+         
+
+           
+
+
+
+
+render json: "OK"
+
+
+
+  else
+    render json: "Machine Setting Not Registered"
+  end
+ else
+  render json: "Machine Not Registered"
+ end
+  
+ 
+  
+
+
+
+
+
+
+ #render json: machine
+       
+  #  mac_id = Machine.find_by_machine_ip(params[:machine_id])
+
+  #  if params["machine_status"] != '3' && params["machine_status"] != '100'
+  #     if mac_id.machine_setting.reason.present?
+  #       reason = mac_id.machine_setting.reason
+  #     else
+  #       reason = "Reason Not Entered"
+  #     end
+  #  else
+  #   mac_id.machine_setting.update(reason: "Reason Not Entered")
+  #   reason = "Reason Not Entered"
+  #  end
+
+
+  #     axis_load = [{ "x_axis": params[:sv_x], "y_axis": params[:sv_y], "z_axis": params[:sv_z], "a_axis": params[:sv_a], "b_axis": params[:sv_b]}]
+  #     axis_temp = [{"x_axis": params[:svtemp_x], "y_axis": params[:svtemp_y], "z_axis": params[:svtemp_z], "a_axis": params[:svtemp_a], "b_axis": params[:svtemp_b]}]
+  #     puls_code = [{"x_axis": params[:svpulse_x], "y_axis": params[:svpulse_y], "z_axis": params[:svpulse_z], "a_axis": params[:svpulse_a], "b_axis": params[:svpulse_b] }]
+
+
+  # log = MachineLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
+  #               job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
+  #               run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
+  #               total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
+
+  # MachineDailyLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
+  #               job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
+  #               run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
+  #               total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
   
 
 
