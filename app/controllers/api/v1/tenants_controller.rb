@@ -2,7 +2,15 @@
   module V1
 class TenantsController < ApplicationController
   before_action :set_tenant, only: [:show, :update, :destroy]
-  skip_before_action :authenticate_request,:only => [:tenant_user_creation]
+ # skip_before_action :authenticate_request,:only => [:tenant_user_creation]
+  skip_before_action :authenticate_request, only: %i[tenant_user_creation search]
+
+  def search
+    byebug
+    @q = Tenant.ransack(params[:search])
+    @tenants = @q.result(distinct: true)
+    render json: @tenants
+  end
 
   # GET /tenants
   def index

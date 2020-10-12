@@ -18,7 +18,8 @@ Rails.application.routes.draw do
  #resources :error_masters
    namespace :api, defaults: {format: 'json'} do
       namespace :v1 do
-      
+        get 'search_tenant' =>  'tenants#search'  
+        
         post 'programmer_login', to: 'authentication#programmer_login'
         post 'file_delete', to: 'program_confs#file_delete'
         post 'move_file', to: 'program_confs#move_file'

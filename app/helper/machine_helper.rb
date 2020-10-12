@@ -1,5 +1,11 @@
 module MachineHelper
 
+def remove_cache
+$redis.flushall
+end
+
+
+
 def machine_cache
 
 	machine_list = $redis.get("machine_list") rescue nil
@@ -70,8 +76,9 @@ def user
 end
 
 def one_sing
+
 	one_sing = $redis.get("one_sing") rescue nil
-	
+
 	if one_sing.nil?	
 	one_sing = OneSignal.all
 	one_sing = one_sing.to_json 	

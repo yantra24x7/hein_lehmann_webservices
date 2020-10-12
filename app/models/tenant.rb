@@ -37,4 +37,26 @@ has_many :mail_logs
 
 serialize :machine_type, Array
 
+
+def self.search(*args)
+ byebug
+  options = args.extract_options!
+  find_by_sql [ "SELECT * FROM tenants WHERE MATCH (tenant_name, city) AGAINST ('database' IN NATURAL LANGUAGE MODE)" ]
+
+
+
+
+
+
+
+
+	 # words = query.to_s.strip.split
+	 # #a = [tenant_name, city]
+	 # #a.each do |kk|
+	 # words.map! { |word| "tenant_name LIKE '%#{word}%'" }
+  #   sql = words.join(" AND ")
+  #   self.where(sql)
+  #   #end
+end
+
 end
