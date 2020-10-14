@@ -4,6 +4,7 @@ class AlarmHistoriesController < ApplicationController
 
   before_action :set_alarm_history, only: [:show, :update, :destroy]
   skip_before_action :authenticate_request, only: %i[create alarm_last_history]
+  include MachineHelper
   # GET /alarm_histories
   def index
      @alarm_histories = AlarmTest.includes(:machine).where(machines: {tenant_id:params[:tenant_id]}).order(:time).reverse
@@ -85,6 +86,7 @@ def machine_setting_list
   def machine_setting_update
    list = MachineSettingList.find_by_id(params[:machine_setting_list_id]).update(is_active:params[:is_active])
     list1 = MachineSettingList.find_by_id(params[:machine_setting_list_id])
+     remoe=remove_cache
     render json: list1
   end
 

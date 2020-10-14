@@ -60,6 +60,7 @@ class MachinesController < ApplicationController
       @machine_setting_list = MachineSettingList.create(setting_name: "z_axis", machine_setting_id: @machine_setting.id)
       @machine_setting_list = MachineSettingList.create(setting_name: "a_axis", machine_setting_id: @machine_setting.id)
       @machine_setting_list = MachineSettingList.create(setting_name: "b_axis", machine_setting_id: @machine_setting.id)
+     remoe=remove_cache
      render json: @machine, status: :created#, location: @machine
     else
       render json: @machine.errors, status: :unprocessable_entity
@@ -215,6 +216,7 @@ end
  #   RestClient.post "http://13.234.15.170/api/v1/rest_machine_update", @machine.attributes, {content_type: :json, accept: :json}
 
     if @machine.update(machine_params)
+      remoe=remove_cache
       render json: @machine
     else
       render json: @machine.errors, status: :unprocessable_entity
