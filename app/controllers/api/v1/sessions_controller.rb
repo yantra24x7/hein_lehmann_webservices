@@ -171,13 +171,13 @@ class SessionsController < ApplicationController
         user
       end
 
-
       
       if user.usertype_id == 1
       render json: {
           type: user.usertype_id,
           user: user,
           id: user.id,
+          tenant_name:user.tenant.tenant_name,
           first_name: user.first_name,
           usertype_id: user.usertype_id,
           tenant_id: user.tenant_id,
@@ -194,6 +194,7 @@ class SessionsController < ApplicationController
           type: user.usertype_id,
           user: user,
           id: user.id,
+          tenant_name:user.tenant.tenant_name,
           first_name: user.first_name,
           usertype_id: user.usertype_id,
           tenant_id: user.tenant_id,
@@ -203,7 +204,7 @@ class SessionsController < ApplicationController
          # machine_count: user.tenant.machines.count,
           #setting: user.tenant.setting,
           access_token: command.result,
-           message: 'Login Successful'
+          message: 'Login Successful'
       }
     end
     else

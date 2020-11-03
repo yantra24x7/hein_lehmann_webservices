@@ -75,6 +75,75 @@ has_one :machine_setting
   # end
 
 
+def self.get_run_time(du_value, all_value, start_time, end_time)
+    collect_data = []
+    run_time = []
+    idle_time = []
+    stop_time = []
+#byebug  
+  if du_value.count == 0
+      collect_data << {status: 100, du_time: (end_time - start_time).to_i}
+    elsif du_value.count == 1
+	start_time = du_value.first.created_at.localtime if start_date.to_date == Date.today
+	end_time = DateTime.now.localtime if end_date.to_date == Date.today
+      id_ind = all_value.find_index(data)
+      status = all_value[id_ind-1].present? ? all_value[id_ind-1].machine_status : all_value[id_ind].machine_status
+      t1 = (data.created_at.localtime - start_time).to_i
+      t2 = (end_time - data.created_at.localtime).to_i
+      collect_data << {status: status, du_time: t1}
+      collect_data << {status: data.machine_status, du_time: t2}
+    else
+	start_time = start_time.to_date == Date.today ? du_value.order(created_at: :asc).first.created_at.localtime : du_value.order(created_at: :asc).first.created_at
+	end_time = end_time.to_date == Date.today ? DateTime.now.localtime : du_value.order(created_at: :asc).last.created_at
+      du_value.each_with_index do |data, index|
+        if du_value[0] == data
+          st_mean_time = (data.created_at.localtime - start_time).to_i
+          if st_mean_time == 0
+            collect_data << {status: data.machine_status, du_time: st_mean_time}
+          else
+            id_ind = all_value.find_index(data)
+            status = all_value[id_ind-1].present? ? all_value[id_ind-1].machine_status : data.machine_status
+            collect_data << {status: status, du_time: st_mean_time}
+          end
+        elsif du_value[-1] == data
+          end_mean_time = (end_time - data.created_at.localtime).to_i
+          collect_data << {status: data.machine_status, du_time: end_mean_time}
+        else
+           f_data = du_value[index - 1]
+           status = f_data.machine_status
+           time = (data.created_at - f_data.created_at).to_i
+           collect_data << {status: status, du_time: time}
+        end
+      end
+    end        
+  collect_data.each do |ii|
+    if ii[:status] == 3
+      run_time << ii[:du_time]
+    elsif ii[:status] == 100
+      stop_time << ii[:du_time]
+    else
+      idle_time << ii[:du_time]
+    end    
+  end
+  return run_time.sum
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def self.daily_maintanence(params)
 #Machine.where(tenant_id:Tenant.where(isactive:true).ids).map do |machine|
 # Machine.where(tenant_id:[18,121,136,187,196,199]).map do |machine|

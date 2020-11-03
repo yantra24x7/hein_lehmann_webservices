@@ -12,6 +12,89 @@ class CncReport < ApplicationRecord
   serialize :puls_code, Array
 
 
+ def self.generate_machine_report(input_date)
+  @machines = Machine.all
+  date = input_date.to_date
+  @machines.map do |machine|
+    @machine_logs = MachineDailyLog.where(machine_id: machine.id, date: date)
+    @full_logs = MachineDailyLog.where(machine_id: machine.id)
+    run_time_in_seconds = Machine.get_run_time(@machine_logs, @full_logs, date.beginning_of_day, date.end_of_day)
+    run_time = Time.at(run_time_in_seconds).utc.strftime("%H:%M:%S")
+  
+    @machine_logs = MachineDailyLog.where(machine_id: machine.id, date: date)
+    @machine_logs = @machine_logs.select('*, JSON_EXTRACT(temperature, "$.temp") AS temp').order('temp asc') if @machine_logs.present?
+    min_temp_log = @machine_logs.first
+    max_temp_log = @machine_logs.last
+    min_temp = min_temp_log.temperature["temp"] if min_temp_log.present? && min_temp_log.temperature.present?
+    max_temp = max_temp_log.temperature["temp"] if max_temp_log.present? && max_temp_log.temperature.present?
+    min_temp_date = min_temp_log.created_at.localtime if min_temp_log.present?
+    max_temp_date = max_temp_log.created_at.localtime if max_temp_log.present?
+
+    @machine_logs = MachineDailyLog.where(machine_id: machine.id, date: date)
+    @machine_logs = @machine_logs.select('*, JSON_EXTRACT(temperature, "$.temp1") AS temp1').order('temp1 asc') if @machine_logs.present?
+    min_temp1_log = @machine_logs.first
+    max_temp1_log = @machine_logs.last
+    min_temp1 = min_temp1_log.temperature["temp1"] if min_temp1_log.present? && min_temp1_log.temperature.present?
+    max_temp1 = max_temp1_log.temperature["temp1"] if max_temp1_log.present? && max_temp1_log.temperature.present?    
+    min_temp1_date = min_temp1_log.created_at.localtime if min_temp1_log.present?
+    max_temp1_date = max_temp1_log.created_at.localtime if max_temp1_log.present?
+
+    @machine_logs = MachineDailyLog.where(machine_id: machine.id, date: date)
+    @machine_logs = @machine_logs.select('*, JSON_EXTRACT(distance, "$.dist1") AS dist1').order('dist1 asc') if @machine_logs.present?
+    min_dist1_log = @machine_logs.first
+    max_dist1_log = @machine_logs.last
+    min_dist1 = min_dist1_log.distance["dist1"] if min_dist1_log.present? && min_dist1_log.distance.present?
+    max_dist1 = max_dist1_log.distance["dist1"] if max_dist1_log.present? && max_dist1_log.distance.present?    
+    min_dist1_date = min_dist1_log.created_at.localtime if min_dist1_log.present?
+    max_dist1_date = max_dist1_log.created_at.localtime if max_dist1_log.present?
+
+    @machine_logs = MachineDailyLog.where(machine_id: machine.id, date: date)
+    @machine_logs = @machine_logs.select('*, JSON_EXTRACT(distance, "$.dist2") AS dist2').order('dist2 asc') if @machine_logs.present?
+    min_dist2_log = @machine_logs.first
+    max_dist2_log = @machine_logs.last
+    min_dist2 = min_dist2_log.distance["dist2"] if min_dist2_log.present? && min_dist2_log.distance.present?
+    max_dist2 = max_dist2_log.distance["dist2"] if max_dist2_log.present? && max_dist2_log.distance.present?    
+    min_dist2_date = min_dist2_log.created_at.localtime if min_dist2_log.present?
+    max_dist2_date = max_dist2_log.created_at.localtime if max_dist2_log.present?
+
+    @machine_logs = MachineDailyLog.where(machine_id: machine.id, date: date)
+    @machine_logs = @machine_logs.select('*, JSON_EXTRACT(distance, "$.dist3") AS dist3').order('dist3 asc') if @machine_logs.present?
+    min_dist3_log = @machine_logs.first
+    max_dist3_log = @machine_logs.last
+    min_dist3 = min_dist3_log.distance["dist3"] if min_dist3_log.present? && min_dist3_log.distance.present?
+    max_dist3 = max_dist3_log.distance["dist3"] if max_dist3_log.present? && max_dist3_log.distance.present?    
+    min_dist3_date = min_dist3_log.created_at.localtime if min_dist3_log.present?
+    max_dist3_date = max_dist3_log.created_at.localtime if max_dist3_log.present?
+
+    @machine_logs = MachineDailyLog.where(machine_id: machine.id, date: date)
+    @machine_logs = @machine_logs.select('*, JSON_EXTRACT(distance, "$.dist4") AS dist4').order('dist4 asc') if @machine_logs.present?
+    min_dist4_log = @machine_logs.first
+    max_dist4_log = @machine_logs.last
+    min_dist4 = min_dist4_log.distance["dist4"] if min_dist4_log.present? && min_dist4_log.distance.present?
+    max_dist4 = max_dist4_log.distance["dist4"] if max_dist4_log.present? && max_dist4_log.distance.present?    
+    min_dist4_date = min_dist4_log.created_at.localtime if min_dist4_log.present?
+    max_dist4_date = max_dist4_log.created_at.localtime if max_dist4_log.present?
+
+    ebh_temp_drive_end = {min: {value: min_temp, date: min_temp_date}, max: {value: max_temp, date: max_temp_date}}
+    ebh_temp_nondrive_end = {min: {value: min_temp1, date: min_temp1_date}, max: {value: max_temp1, date: max_temp1_date}} 
+    buffer_level_l = {min: {value: min_dist1, date: min_dist1_date}, max: {value: max_dist1, date: max_dist1_date}}
+    buffer_level_r = {min: {value: min_dist2, date: min_dist2_date}, max: {value: max_dist2, date: max_dist2_date}}
+    spring_level_l = {min: {value: min_dist3, date: min_dist3_date}, max: {value: max_dist3, date: max_dist3_date}}
+    spring_level_r = {min: {value: min_dist4, date: min_dist4_date}, max: {value: max_dist4, date: max_dist4_date}}
+
+    temp_buffer_data = {ebh_temp_drive_end: ebh_temp_drive_end, ebh_temp_nondrive_end: ebh_temp_nondrive_end, buffer_level_l: buffer_level_l, buffer_level_r: buffer_level_r, spring_level_l: spring_level_l, spring_level_r: spring_level_r}
+
+    @report = CncReport.find_by(date: date, machine_id: machine.id)
+    unless @report.present?
+      CncReport.create(date: date, machine_id: machine.id, tenant_id: machine.tenant_id, run_time: run_time, temp_and_buffer: temp_buffer_data)
+    else
+      @report.update(date: date, machine_id: machine.id, tenant_id: machine.tenant_id, run_time: run_time, temp_and_buffer: temp_buffer_data)
+    end
+
+  end    
+end
+
+
 def self.data_sync
 system('aws s3 sync /home/ubuntu/machine_log_files/ s3://yantra24x7/logs')
 end

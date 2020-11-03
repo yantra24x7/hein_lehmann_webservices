@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200120095715) do
+ActiveRecord::Schema.define(version: 20201030093310) do
 
   create_table "AlarmCodes_MachineSeriesNos", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "machine_series_no_id", null: false
@@ -190,6 +190,7 @@ ActiveRecord::Schema.define(version: 20200120095715) do
     t.text     "puls_code",            limit: 65535
     t.string   "test_code"
     t.json     "parts_data"
+    t.json     "temp_and_buffer"
     t.index ["date"], name: "index_cnc_reports_on_date", using: :btree
     t.index ["machine_id"], name: "index_cnc_reports_on_machine_id", using: :btree
     t.index ["operator_id"], name: "index_cnc_reports_on_operator_id", using: :btree
@@ -284,16 +285,16 @@ ActiveRecord::Schema.define(version: 20200120095715) do
   end
 
   create_table "code_compare_reasons", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "user_name"
+    t.integer  "user_id"
     t.integer  "machine_id"
     t.string   "description"
-    t.datetime "create_date"
-    t.string   "old_revision_no"
-    t.string   "new_revision_no"
-    t.string   "file_name"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.integer  "current_location"
+    t.boolean  "status"
+    t.string   "file_path"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
     t.index ["machine_id"], name: "index_code_compare_reasons_on_machine_id", using: :btree
+    t.index ["user_id"], name: "index_code_compare_reasons_on_user_id", using: :btree
   end
 
   create_table "common_settings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -717,34 +718,15 @@ ActiveRecord::Schema.define(version: 20200120095715) do
   end
 
   create_table "machine_daily_logs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "parts_count"
+    t.date     "date"
     t.integer  "machine_status"
-    t.string   "job_id"
-    t.integer  "total_run_time"
-    t.integer  "total_cutting_time"
-    t.integer  "run_time"
-    t.integer  "feed_rate"
-    t.integer  "cutting_speed"
-    t.integer  "axis_load"
-    t.string   "axis_name"
-    t.integer  "spindle_speed"
-    t.integer  "spindle_load"
-    t.integer  "total_run_second"
-    t.string   "programe_number"
-    t.string   "programe_description"
-    t.integer  "run_second"
+    t.json     "temperature"
+    t.json     "distance"
     t.integer  "machine_id"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-    t.datetime "machine_time"
-    t.string   "cycle_time_minutes"
-    t.string   "machine_total_time"
-    t.string   "cycle_time_per_part"
-    t.string   "total_cutting_second"
-    t.string   "x_axis"
-    t.string   "y_axis"
-    t.string   "z_axis"
-    t.string   "reason"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["created_at"], name: "index_machine_daily_logs_on_created_at", using: :btree
+    t.index ["date"], name: "index_machine_daily_logs_on_date", using: :btree
     t.index ["machine_id"], name: "index_machine_daily_logs_on_machine_id", using: :btree
   end
 
@@ -776,34 +758,15 @@ ActiveRecord::Schema.define(version: 20200120095715) do
   end
 
   create_table "machine_logs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "parts_count"
+    t.date     "date"
     t.integer  "machine_status"
-    t.string   "job_id"
-    t.integer  "total_run_time"
-    t.integer  "total_cutting_time"
-    t.integer  "run_time"
-    t.integer  "feed_rate"
-    t.integer  "cutting_speed"
-    t.integer  "axis_load"
-    t.string   "axis_name"
-    t.integer  "spindle_speed"
-    t.integer  "spindle_load"
-    t.integer  "total_run_second"
-    t.string   "programe_number"
-    t.string   "programe_description"
-    t.integer  "run_second"
+    t.json     "temperature"
+    t.json     "distance"
     t.integer  "machine_id"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-    t.datetime "machine_time"
-    t.string   "cycle_time_minutes"
-    t.string   "machine_total_time"
-    t.string   "cycle_time_per_part"
-    t.string   "total_cutting_second"
-    t.string   "x_axis"
-    t.string   "y_axis"
-    t.string   "z_axis"
-    t.string   "reason"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["created_at"], name: "index_machine_logs_on_created_at", using: :btree
+    t.index ["date"], name: "index_machine_logs_on_date", using: :btree
     t.index ["machine_id"], name: "index_machine_logs_on_machine_id", using: :btree
   end
 
@@ -828,11 +791,6 @@ ActiveRecord::Schema.define(version: 20200120095715) do
     t.integer  "machine_id"
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
-    t.string   "total_cutting_second"
-    t.string   "x_axis"
-    t.string   "y_axis"
-    t.string   "z_axis"
-    t.string   "reason"
     t.index ["machine_id"], name: "index_machine_monthly_logs_on_machine_id", using: :btree
   end
 
@@ -1602,6 +1560,7 @@ ActiveRecord::Schema.define(version: 20200120095715) do
   add_foreign_key "cncvendors", "cncoperations"
   add_foreign_key "cncvendors", "tenants"
   add_foreign_key "code_compare_reasons", "machines"
+  add_foreign_key "code_compare_reasons", "users"
   add_foreign_key "connection_logs", "tenants"
   add_foreign_key "consolidate_data", "machines"
   add_foreign_key "consummablemaintanances", "machines"

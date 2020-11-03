@@ -2,8 +2,107 @@
   module V1
 class MachinesController < ApplicationController
   before_action :set_machine, only: [:show, :update, :destroy]
-  skip_before_action :authenticate_request, only: %i[api alarm_api rsmachine_data]
+  skip_before_action :authenticate_request, only: %i[api alarm_api rsmachine_data dashboard_analytics]
   include MachineHelper
+
+  
+  def machine_analytics_report 
+   filter_query = params[:start_date].present? && params[:end_date].present? ? {date: Date.today-1} : {date: params[:start_date].to_date..params[:end_date].to_date}
+    request.params.map{|k, v| filter_query[k] = v if CncReport.column_names.include?(k)}
+	@report_data = CncReport.where(filter_query)
+	render json: @report_data
+end
+
+
+  def dashboard_analytics
+input_date = params[:date].present? ? params[:date].to_date : Date.today
+dates_arr = [input_date-1, input_date, input_date+1]
+response = {}
+machine_running_time = {}
+ebh_temp_drive_end = {}
+ebh_temp_nondrive_end = {}
+buffer_level_l = {}
+buffer_level_l = {}
+buffer_level_r = {}
+buffer_level_r = {}
+spring_level_l = {}
+spring_level_r = {}
+dates_arr.map do |date|
+day_name = date == input_date ? "today" : date == input_date-1 ? "previous_day" : "next_day"
+
+@machine_logs = MachineDailyLog.where(machine_id: params[:machine_id], date: date)
+@full_logs = MachineDailyLog.where(machine_id: params[:machine_id])
+start_time = date == Date.today ? Time.now.beginning_of_day : date.beginning_of_day
+end_time = date == Date.today ? Time.now : date.end_of_day
+run_time_in_seconds = Machine.get_run_time(@machine_logs, @full_logs, start_time, end_time)
+run_time = Time.at(run_time_in_seconds).utc.strftime("%H:%M:%S")
+machine_running_time[day_name] = run_time
+
+@machine_logs = MachineDailyLog.where(machine_id: params[:machine_id], date: date)
+@machine_logs = @machine_logs.select('*, JSON_EXTRACT(temperature, "$.temp") AS temp').order('temp asc') if @machine_logs.present?
+min_temp_log = @machine_logs.first
+max_temp_log = @machine_logs.last
+min_temp = min_temp_log.temperature["temp"] if min_temp_log.present? && min_temp_log.temperature.present?
+max_temp = max_temp_log.temperature["temp"] if max_temp_log.present? && max_temp_log.temperature.present?
+min_temp_date = min_temp_log.created_at.localtime if min_temp_log.present?
+max_temp_date = max_temp_log.created_at.localtime if max_temp_log.present?
+
+@machine_logs = MachineDailyLog.where(machine_id: params[:machine_id], date: date)
+@machine_logs = @machine_logs.select('*, JSON_EXTRACT(temperature, "$.temp1") AS temp1').order('temp1 asc') if @machine_logs.present?
+min_temp1_log = @machine_logs.first
+max_temp1_log = @machine_logs.last
+min_temp1 = min_temp1_log.temperature["temp1"] if min_temp1_log.present? && min_temp1_log.temperature.present?
+max_temp1 = max_temp1_log.temperature["temp1"] if max_temp1_log.present? && max_temp1_log.temperature.present?
+min_temp1_date = min_temp1_log.created_at.localtime if min_temp1_log.present?
+max_temp1_date = max_temp1_log.created_at.localtime if max_temp1_log.present?
+
+@machine_logs = MachineDailyLog.where(machine_id: params[:machine_id], date: date)
+@machine_logs = @machine_logs.select('*, JSON_EXTRACT(distance, "$.dist1") AS dist1').order('dist1 asc') if @machine_logs.present?
+min_dist1_log = @machine_logs.first
+max_dist1_log = @machine_logs.last
+min_dist1 = min_dist1_log.distance["dist1"] if min_dist1_log.present? && min_dist1_log.distance.present?
+max_dist1 = max_dist1_log.distance["dist1"] if max_dist1_log.present? && max_dist1_log.distance.present?
+min_dist1_date = min_dist1_log.created_at.localtime if min_dist1_log.present?
+max_dist1_date = max_dist1_log.created_at.localtime if max_dist1_log.present?
+
+@machine_logs = MachineDailyLog.where(machine_id: params[:machine_id], date: date)
+@machine_logs = @machine_logs.select('*, JSON_EXTRACT(distance, "$.dist2") AS dist2').order('dist2 asc') if @machine_logs.present?
+min_dist2_log = @machine_logs.first
+max_dist2_log = @machine_logs.last
+min_dist2 = min_dist2_log.distance["dist2"] if min_dist2_log.present? && min_dist2_log.distance.present?
+max_dist2 = max_dist2_log.distance["dist2"] if max_dist2_log.present? && max_dist2_log.distance.present?
+min_dist2_date = min_dist2_log.created_at.localtime if min_dist2_log.present?
+max_dist2_date = max_dist2_log.created_at.localtime if max_dist2_log.present?
+
+@machine_logs = MachineDailyLog.where(machine_id: params[:machine_id], date: date)
+@machine_logs = @machine_logs.select('*, JSON_EXTRACT(distance, "$.dist3") AS dist3').order('dist3 asc') if @machine_logs.present?
+min_dist3_log = @machine_logs.first
+max_dist3_log = @machine_logs.last
+min_dist3 = min_dist3_log.distance["dist3"] if min_dist3_log.present? && min_dist3_log.distance.present?
+max_dist3 = max_dist3_log.distance["dist3"] if max_dist3_log.present? && max_dist3_log.distance.present?
+min_dist3_date = min_dist3_log.created_at.localtime if min_dist3_log.present?
+max_dist3_date = max_dist3_log.created_at.localtime if max_dist3_log.present?
+
+@machine_logs = MachineDailyLog.where(machine_id: params[:machine_id], date: date)
+@machine_logs = @machine_logs.select('*, JSON_EXTRACT(distance, "$.dist4") AS dist4').order('dist4 asc') if @machine_logs.present?
+min_dist4_log = @machine_logs.first
+max_dist4_log = @machine_logs.last
+min_dist4 = min_dist4_log.distance["dist4"] if min_dist4_log.present? && min_dist4_log.distance.present?
+max_dist4 = max_dist4_log.distance["dist4"] if max_dist4_log.present? && max_dist4_log.distance.present?
+min_dist4_date = min_dist4_log.created_at.localtime if min_dist4_log.present?
+max_dist4_date = max_dist4_log.created_at.localtime if max_dist4_log.present?
+
+ebh_temp_drive_end[day_name] = {min: {value: min_temp, date: min_temp_date}, max: {value: max_temp, date: max_temp_date}}
+ebh_temp_nondrive_end[day_name] = {min: {value: min_temp1, date: min_temp1_date}, max: {value: max_temp1, date: max_temp1_date}}
+buffer_level_l[day_name] = {min: {value: min_dist1, date: min_dist1_date}, max: {value: max_dist1, date: max_dist1_date}}
+buffer_level_r[day_name] = {min: {value: min_dist2, date: min_dist2_date}, max: {value: max_dist2, date: max_dist2_date}}
+spring_level_l[day_name] = {min: {value: min_dist3, date: min_dist3_date}, max: {value: max_dist3, date: max_dist3_date}}
+spring_level_r[day_name] = {min: {value: min_dist4, date: min_dist4_date}, max: {value: max_dist4, date: max_dist4_date}}
+end
+response = {machine_running_time: machine_running_time, ebh_temp_drive_end: ebh_temp_drive_end, ebh_temp_nondrive_end: ebh_temp_nondrive_end, buffer_level_l: buffer_level_l, buffer_level_r: buffer_level_r, spring_level_l: spring_level_l, spring_level_r: spring_level_r}
+render json: response
+end
+
 
 
   # GET /machines
@@ -60,7 +159,7 @@ class MachinesController < ApplicationController
       @machine_setting_list = MachineSettingList.create(setting_name: "z_axis", machine_setting_id: @machine_setting.id)
       @machine_setting_list = MachineSettingList.create(setting_name: "a_axis", machine_setting_id: @machine_setting.id)
       @machine_setting_list = MachineSettingList.create(setting_name: "b_axis", machine_setting_id: @machine_setting.id)
-     remoe=remove_cache
+   #  remoe=remove_cache
      render json: @machine, status: :created#, location: @machine
     else
       render json: @machine.errors, status: :unprocessable_entity
@@ -308,43 +407,55 @@ end
 # data insert API
   def api
  
- # remoe=remove_cache
-  m_set = m_setting
-  machine = machine_cache
 
- find_data = machine.select{|i| i['machine_ip'] == params['machine_id']}
 
- if find_data.present?
-  mac_id = Machine.new(find_data.first)
-  mac_sets= m_set.select{|i| i['machine_id'] == mac_id.id}
-  if mac_sets.present?
-    mac_set = mac_sets.first
-    machine_setting = MachineSetting.new(mac_set)
-  if params["machine_status"] != '3' && params["machine_status"] != '100'
-      if machine_setting.reason.present?
-        reason = machine_setting.reason
-      else
-        reason = "Reason Not Entered"
-      end
-   else
-    #mac_set.update(reason: "Reason Not Entered")
-    reason = "Reason Not Entered"
-   end
+mac = Machine.find_by_machine_ip(params["machine_id"]) 
+temp = JSON.parse(params["temperature"])
+dist = JSON.parse(params["distance"])
+MachineLog.create(machine_id: mac.id,machine_status:params["status"],temperature:temp, distance:dist,date:Time.now.strftime("%d-%m-%Y"))
+MachineDailyLog.create(machine_id: mac.id,machine_status:params["status"],temperature:temp,distance:dist,date:Time.now.strftime("%d-%m-%Y"))  # remoe=remove_cache
+#   m_set = m_setting
+#   machine = machine_cache
 
-    axis_load = [{ "x_axis": params[:sv_x], "y_axis": params[:sv_y], "z_axis": params[:sv_z], "a_axis": params[:sv_a], "b_axis": params[:sv_b]}]
-    axis_temp = [{"x_axis": params[:svtemp_x], "y_axis": params[:svtemp_y], "z_axis": params[:svtemp_z], "a_axis": params[:svtemp_a], "b_axis": params[:svtemp_b]}]
-    puls_code = [{"x_axis": params[:svpulse_x], "y_axis": params[:svpulse_y], "z_axis": params[:svpulse_z], "a_axis": params[:svpulse_a], "b_axis": params[:svpulse_b] }]
+#  find_data = machine.select{|i| i['machine_ip'] == params['machine_id']}
 
-log = MachineLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
-                job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
-                run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
-                total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
+#  if find_data.present?
+#   mac_id = Machine.new(find_data.first)
+#   mac_sets= m_set.select{|i| i['machine_id'] == mac_id.id}
+#   if mac_sets.present?
+#     mac_set = mac_sets.first
+#     machine_setting = MachineSetting.new(mac_set)
+#   if params["machine_status"] != '3' && params["machine_status"] != '100'
+#       if machine_setting.reason.present?
+#         reason = machine_setting.reason
+#       else
+#         reason = "Reason Not Entered"
+#       end
+#    else
+#     #mac_set.update(reason: "Reason Not Entered")
+#     reason = "Reason Not Entered"
+#    end
 
-  MachineDailyLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
-                job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
-                run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
-                total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
+#     axis_load = [{ "x_axis": params[:sv_x], "y_axis": params[:sv_y], "z_axis": params[:sv_z], "a_axis": params[:sv_a], "b_axis": params[:sv_b]}]
+#     axis_temp = [{"x_axis": params[:svtemp_x], "y_axis": params[:svtemp_y], "z_axis": params[:svtemp_z], "a_axis": params[:svtemp_a], "b_axis": params[:svtemp_b]}]
+#     puls_code = [{"x_axis": params[:svpulse_x], "y_axis": params[:svpulse_y], "z_axis": params[:svpulse_z], "a_axis": params[:svpulse_a], "b_axis": params[:svpulse_b] }]
+
+# log = MachineLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
+#                 job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
+#                 run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
+#                 total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
+
+#   MachineDailyLog.create!(machine_status: params[:machine_status],parts_count: params[:parts_count],machine_id: mac_id.id,
+#                 job_id: params[:job_id],total_run_time: params[:total_run_time],total_cutting_time: params[:total_cutting_time],
+#                 run_time: params[:run_time],feed_rate: params[:feed_rate],cutting_speed: params[:cutting_speed],
+#                 total_run_second:params[:total_cutting_time_second],run_second: params[:run_time_seconds],programe_number: params[:programe_number],machine_time: params[:machine_time], cycle_time_minutes: puls_code, cycle_time_per_part: reason, total_cutting_second: params[:total_cutting_time_second], spindle_load: params[:sp], x_axis: axis_load, y_axis: axis_temp, z_axis: params[:sp_temp])
   
+
+
+
+
+
+
 # unless log.machine_status == 3  
 #   te_setting = setting
 #   set_almrm = set_alm
@@ -442,12 +553,12 @@ log = MachineLog.create!(machine_status: params[:machine_status],parts_count: pa
 
 
 
-  else
-    render json: "Machine Setting Not Registered"
-  end
- else
-  render json: "Machine Not Registered"
- end
+ #  else
+ #    render json: "Machine Setting Not Registered"
+ #  end
+ # else
+ #  render json: "Machine Not Registered"
+ # end
   
  
   

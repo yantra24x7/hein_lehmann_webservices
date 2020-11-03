@@ -6,7 +6,7 @@ class UsersController < ApplicationController
    
   # GET /users
   def index
-    users = User.where(tenant_id:params[:tenant_id]).where.not(role_id:1)
+    users = User.where(tenant_id:params[:tenant_id])#.where.not(role_id:1)
     #users = Tenant.find(params[:tenant_id]).users.where.not(role_id:Tenant.find(params[:tenant_id]).roles.where(role_name:"CEO")[0].id)
     render json: users
   end
@@ -20,8 +20,8 @@ class UsersController < ApplicationController
   def create
    # @user = User.new(user_params)
     # @user = User.new(first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id], approval_id: params[:approval_id], tenant_id: params[:tenant_id], role_id: params[:role_id],isactive: true)
-  @user_data = {first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id], tenant_id:params[:tenant_id], role_id:params[:role_id], default: params[:password],isactive: false}    
-  @user = User.new(first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id], tenant_id:params[:tenant_id], role_id:params[:role_id], default: params[:password],isactive: false)
+  @user_data = {first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id], tenant_id:params[:tenant_id], role_id:params[:role_id], default: params[:password],isactive: true}    
+  @user = User.new(first_name: params[:first_name], last_name: params[:last_name], email_id: params[:email_id], password: params[:password], phone_number: params[:phone_number], remarks: params[:remarks], usertype_id: params[:usertype_id], tenant_id:params[:tenant_id], role_id:params[:role_id], default: params[:password],isactive: true)
    
 #   require 'rest-client'
 #    RestClient.post "http://13.234.15.170/api/v1/rest_user_create", @user_data, {content_type: :json, accept: :json}    

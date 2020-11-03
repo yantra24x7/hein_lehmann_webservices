@@ -1,6 +1,11 @@
 class CncReportSerializer < ActiveModel::Serializer
   #attributes :id
-  attributes :id,:date,:shift_no,:time,:operator_id,:operator_name,:machine_name,:machine_type,:job_description,:parts_produced,:total_downtime,:actual_running,:idle_time,:utilization,:shift_id, :program_number, :cycle_time, :actual_working_hours, :loading_and_unloading_time,:spendle_speed, :puls_code,:cutting_time,:feed_rate,:spindle_load,:servo_m_temp,:servo_load,:spindle_m_temp, :availability, :perfomance, :quality, :oee
+  attributes :id,:date,:shift_no,:time,:operator_id,:operator_name,:machine_name,:machine_type,:job_description,:parts_produced,:total_downtime,:actual_running,:idle_time,:utilization,:shift_id, :program_number, :cycle_time, :actual_working_hours, :loading_and_unloading_time,:spendle_speed, :puls_code,:cutting_time,:feed_rate,:spindle_load,:servo_m_temp,:servo_load,:spindle_m_temp, :availability, :perfomance, :quality, :oee, :temp_and_buffer, :vendor_name
+
+def vendor_name
+    object.tenant.tenant_name
+end
+
 def machine_name
 	object.machine.machine_name
 end

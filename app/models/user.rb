@@ -3,7 +3,7 @@ class User < ApplicationRecord
   has_many :operatorworkingdetails,:dependent => :destroy
   belongs_to :usertype
   belongs_to :approval, optional: true
-  belongs_to :tenant, optional: true
+  belongs_to :tenant#, optional: true
   belongs_to :role, optional: true
   has_many :one_signals
   

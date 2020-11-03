@@ -19,6 +19,9 @@ Rails.application.routes.draw do
    namespace :api, defaults: {format: 'json'} do
       namespace :v1 do
         get 'search_tenant' =>  'tenants#search'  
+
+	get 'machine_analytics_report' => 'machines#machine_analytics_report'
+        get "dashboard_analytics" => "machines#dashboard_analytics"
         
         post 'programmer_login', to: 'authentication#programmer_login'
         post 'file_delete', to: 'program_confs#file_delete'
